@@ -18,7 +18,6 @@ function createFormState(formName, model) {
 
 export default compose(
   withPropsOnChange(['formName', 'schema'], ({ formName, schema }) => {
-    console.log(schema.getInitialState());
     const localState = createFormState(formName, schema.getInitialState());
 
     const FormClient = new ApolloClient({
