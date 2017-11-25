@@ -1,0 +1,62 @@
+{
+  "extends": [
+    "@workpop/eslint-config-workpop",
+    "plugin:import/errors"
+  ],
+  "rules": {
+    "react/jsx-filename-extension": 0,
+    "react/no-find-dom-node": 0,
+    "no-underscore-dangle": 1,
+    "new-cap": 0,
+    "max-len": 0,
+    "prefer-arrow-callback": 0,
+    "no-use-before-define": 0,
+    "arrow-body-style": 0,
+    "dot-notation": 0,
+    "no-console": 1,
+    "no-param-reassign": 1,
+    "flowtype/define-flow-type": 1,
+    "flowtype/require-parameter-type": 1,
+    "flowtype/require-return-type": [
+      1,
+      "always",
+      {
+        "annotateUndefined": "never"
+      }
+    ],
+    "flowtype/space-after-type-colon": [
+      1,
+      "always"
+    ],
+    "flowtype/space-before-type-colon": [
+      1,
+      "never"
+    ],
+    "flowtype/type-id-match": [
+      1,
+      "^([A-Z][a-z0-9]+)+Type$"
+    ],
+    "flowtype/use-flow-type": 1,
+    "flowtype/valid-syntax": 1,
+    "react/jsx-uses-react": "error",
+    "react/jsx-uses-vars": "error",
+    "jsx-a11y/no-static-element-interactions": "warn",
+    "class-methods-use-this": "warn"
+  },
+  "parser": "babel-eslint",
+  "plugins": [
+    "flowtype",
+    "react"
+  ],
+  "env": {
+    "mocha": true
+  },
+  "settings": {
+    "flowtype": {
+      "onlyFilesWithFlowAnnotation": true
+    }
+  },
+  "globals": {
+    "React$Node": false
+  }
+}

@@ -1,0 +1,11 @@
+src
+test
+coverage
+resources
+flow-typed
+stories
+.storybook
+__tests__
+.tmp/
+build/
+yarn-error.log
