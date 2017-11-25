@@ -25,7 +25,6 @@ export default compose(
       formName,
       initialData = {},
     }) => {
-
       let data;
 
       try {
@@ -42,7 +41,9 @@ export default compose(
 
       return {
         validationMessage,
-        value: !!internalValue ? internalValue : initialData && initialData[field],
+        value: !!internalValue
+          ? internalValue
+          : initialData && initialData[field],
         hasError: !isClean && hasErrorAt(fieldMessages, field),
       };
     }
@@ -59,6 +60,11 @@ export default compose(
             return setIsClean(false);
           },
         });
+      };
+    },
+    onBlur: ({ setIsClean }) => {
+      return () => {
+        return setIsClean(true);
       };
     },
   }),
