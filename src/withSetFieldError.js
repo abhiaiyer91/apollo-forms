@@ -1,13 +1,9 @@
 import { withHandlers } from 'recompose';
-import getErrorFields from './getErrorFields';
+import setErrors from './setErrors';
 
 export default withHandlers({
   setFieldError: ({ formName, errorsQuery, FormClient, schema, formData }) => {
     return ({ field, value }) => {
-      const errorFields = getErrorFields({ client: FormClient, errorsQuery });
-
-      let errorData = errorFields[`${formName}Errors`];
-
       const schemaValidation = schema.validate({
         ...formData,
         [field]: value,
@@ -21,16 +17,11 @@ export default withHandlers({
         isFieldInValidation = { [field]: null };
       }
 
-      errorData = {
-        ...errorData,
-        ...isFieldInValidation,
-      };
-
-      errorFields[`${formName}Errors`] = errorData;
-
-      return FormClient.writeQuery({
+      return setErrors({
+        client: FormClient,
+        formName,
         query: errorsQuery,
-        data: errorFields,
+        errorMessage: isFieldInValidation,
       });
     };
   },
