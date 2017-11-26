@@ -7,12 +7,10 @@ import {
   isAlphabetic,
   isNumeric,
 } from 'revalidate';
-import { compose } from 'recompose';
 import FormSchema from '../src/Schema';
 import createForm from '../src/withForm';
 import FormProvider from '../src/FormProvider';
-import withValidationMessage from '../src/withValidationMessage';
-import withInput from '../src/withInput';
+import { Input } from './Inputs';
 
 function SubmitControls() {
   return <button type="submit">Submit</button>;
@@ -24,6 +22,13 @@ const sampleMutation = gql`
   }
 `;
 
+const fragment = gql`
+  fragment client on ClientData {
+    name
+    age
+  }
+`;
+
 const query = gql`
   {
     sampleForm @client {
@@ -31,6 +36,7 @@ const query = gql`
       age
     }
   }
+  ${fragment}
 `;
 
 const errorsQuery = gql`
@@ -40,6 +46,7 @@ const errorsQuery = gql`
       age
     }
   }
+  ${fragment}
 `;
 
 const Form = createForm({
@@ -47,24 +54,22 @@ const Form = createForm({
   inputQuery: query,
   errorsQuery: errorsQuery,
 })(FormProvider);
-const Input = compose(withInput, withValidationMessage)('input');
 
 const sampleValidator = combineValidators({
   name: composeValidators(isRequired, isAlphabetic)('Name'),
   age: composeValidators(isRequired, isNumeric)('Age'),
 });
 
-const Schema = new FormSchema({
-  model: {
-    name: null,
-    age: null,
-  },
-  validator: sampleValidator,
-});
+const initialData = {
+  name: null,
+  age: null,
+};
 
 export default function SimpleForm() {
   return (
     <Form
+      validator={sampleValidator}
+      initialData={initialData}
       onSuccess={() => {
         return console.log('Submitted!');
       }}
@@ -76,7 +81,6 @@ export default function SimpleForm() {
         console.log('**** ERRORS', errorMessage[errorKeys[0]]);
       }}
       formName="sampleForm"
-      schema={Schema}
     >
       <Input field="name" />
       <Input type="number" field="age" />

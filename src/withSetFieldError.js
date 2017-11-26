@@ -1,17 +1,12 @@
 import { withHandlers } from 'recompose';
+import getErrorFields from './getErrorFields';
 
 export default withHandlers({
   setFieldError: ({ formName, errorsQuery, FormClient, schema, formData }) => {
     return ({ field, value }) => {
-      let errorField;
+      const errorFields = getErrorFields({ client: FormClient, errorsQuery });
 
-      try {
-        errorField = FormClient.readQuery({ query: errorsQuery });
-      } catch (error) {
-        errorField = {};
-      }
-
-      let errorData = errorField[`${formName}Errors`];
+      let errorData = errorFields[`${formName}Errors`];
 
       const schemaValidation = schema.validate({
         ...formData,
@@ -31,11 +26,11 @@ export default withHandlers({
         ...isFieldInValidation,
       };
 
-      errorField[`${formName}Errors`] = errorData;
+      errorFields[`${formName}Errors`] = errorData;
 
       return FormClient.writeQuery({
         query: errorsQuery,
-        data: errorField,
+        data: errorFields,
       });
     };
   },

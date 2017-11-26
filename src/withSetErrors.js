@@ -1,6 +1,7 @@
 import { withHandlers } from 'recompose';
 import { noop } from 'lodash';
 import scrollToInvalidKey from './scrollToInvalidKey';
+import getErrorFields from './getErrorFields';
 
 export default withHandlers({
   setErrors: ({
@@ -22,26 +23,20 @@ export default withHandlers({
           scrollToInvalidKey(errorKeys[0]);
         }
 
-        let errorField;
+        const errorFields = getErrorFields({ client: FormClient, errorsQuery });
 
-        try {
-          errorField = FormClient.readQuery({ query: errorsQuery });
-        } catch (error) {
-          errorField = {};
-        }
-
-        let errorData = errorField[`${formName}Errors`];
+        let errorData = errorFields[`${formName}Errors`];
 
         errorData = {
           ...errorData,
           ...errorMessage,
         };
 
-        errorField[`${formName}Errors`] = errorData;
+        errorFields[`${formName}Errors`] = errorData;
 
         FormClient.writeQuery({
           query: errorsQuery,
-          data: errorField,
+          data: errorFields,
         });
 
         onErrorMessage(errorMessage);

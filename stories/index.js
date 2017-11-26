@@ -12,8 +12,8 @@ import { compose, withProps } from 'recompose';
 import FormSchema from '../src/Schema';
 import FormProvider from '../src/FormProvider';
 import createForm from '../src/withForm';
-import withValidationMessage from '../src/withValidationMessage';
-import withInput from '../src/withInput';
+import createHydrateProvider from '../src/createHydrateProvider';
+import { Input } from './Inputs';
 import SimpleForm from './SimpleForm';
 
 function SubmitControls() {
@@ -75,46 +75,25 @@ storiesOf('Forms', module)
       }
     `;
 
-    let FormFetcher = function FormFetcher({ loading, children, data }) {
-      if (loading) {
-        return null;
-      }
-      return children(data);
-    };
-
-    FormFetcher = compose(
-      graphql(hydrationQuery),
-      withProps(({ data }) => {
-        return {
-          data: data && data.sampleForm,
-          loading: data && data.loading,
-        };
-      })
-    )(FormFetcher);
+    const sampleValidator = combineValidators({
+      name: composeValidators(isRequired)('Name'),
+      age: composeValidators(isRequired, isNumeric)('Age'),
+    });
 
     const Form = compose(
-      withProps(({ initialData }) => {
-        const sampleValidator = combineValidators({
-          name: composeValidators(isRequired)('Name'),
-          age: composeValidators(isRequired, isNumeric)('Age'),
-        });
-
-        const Schema = new FormSchema({
-          model: initialData,
-          validator: sampleValidator,
-        });
-
-        return {
-          schema: Schema,
-        };
+      withProps({
+        validator: sampleValidator,
       }),
       createForm({ mutation: sampleMutation, inputQuery, errorsQuery })
     )(FormProvider);
 
-    const Input = compose(withInput, withValidationMessage)('input');
+    const HydrateProvider = createHydrateProvider({
+      query: hydrationQuery,
+      queryKey: 'sampleForm',
+    });
 
     return (
-      <FormFetcher>
+      <HydrateProvider>
         {(data) => {
           return (
             <Form
@@ -132,7 +111,6 @@ storiesOf('Forms', module)
                   alert(errorMessage[errorKeys[0]]);
               }}
               formName="sampleForm"
-              inputQuery={inputQuery}
             >
               <Input field="name" />
               <Input type="number" field="age" />
@@ -140,6 +118,6 @@ storiesOf('Forms', module)
             </Form>
           );
         }}
-      </FormFetcher>
+      </HydrateProvider>
     );
   });

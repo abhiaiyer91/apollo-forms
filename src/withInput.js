@@ -10,6 +10,7 @@ import {
 import withErrorQuery from './withErrorQuery';
 import withSetFieldError from './withSetFieldError';
 import _formContextTypes from './_formContextTypes';
+import withValidationMessage from './withValidationMessage';
 
 export default compose(
   getContext(_formContextTypes),
@@ -65,14 +66,13 @@ export default compose(
       };
     },
   }),
-  mapProps(({ type, validationMessage, onChange, field, value, hasError }) => {
+  withValidationMessage,
+  mapProps(({ type, onChange, field, value }) => {
     return {
       type,
       onChange,
       name: field,
       value,
-      hasError,
-      validationMessage,
     };
-  })
+  }),
 );
