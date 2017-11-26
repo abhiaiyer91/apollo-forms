@@ -146,6 +146,87 @@ export default function Root() {
 }
 ```
 
+# Hydrating a Form
+
+As long as a `FormProvider` gets `initialData` the form will hydrate the appropriate fields in the form.
+There are some utils provided that may help you hydrate your Form:
+
+## 1. Create a HydrateProvider
+
+```js
+import { createHydrateProvider } from 'apollo-forms';
+
+const query = gql`
+  {
+    query sample {
+      sampleForm {
+        name
+        age
+      }
+    }
+  }
+`;
+
+const HydrateProvider = createHydrateProvider({
+  query,
+  queryKey: 'sampleForm',
+});
+```
+
+## 2. Use a render prop to pass it into your form:
+
+```js
+export default function Root() {
+  return (
+    <HydrateProvider>
+      {(data) => {
+        return (
+          <Form
+            initialData={data}
+            formName="sampleForm"
+          >
+            <Input field="name" />
+            <Input type="number" field="age" />
+            <SubmitControls />
+          </Form>
+        );
+      }}
+    </HydrateProvider>
+  );
+}
+```
+
+## 3. Or use withHandlers
+
+```js
+import { withHandlers } from 'recompose';
+
+function Root({ renderForm }) {
+  return (
+    <HydrateProvider>
+      {renderForm}
+    </HydrateProvider>
+  );
+}
+
+export default withHandlers({
+  renderForm: () => {
+    return (data) => {
+      return (
+        <Form
+          initialData={data}
+          formName="sampleForm"
+        >
+          <Input field="name" />
+          <Input type="number" field="age" />
+          <SubmitControls />
+        </Form>
+      );
+    }
+  }
+})(Root);
+```
+
 # How this works
 
 Under the hood, `apollo-forms` creates a `ApolloClient` instance with `apollo-linked-state`. The form gets its own
