@@ -1,7 +1,6 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
 import {
   combineValidators,
   composeValidators,
@@ -9,7 +8,6 @@ import {
   isNumeric,
 } from 'revalidate';
 import { compose, withProps } from 'recompose';
-import FormSchema from '../src/Schema';
 import FormProvider from '../src/FormProvider';
 import createForm from '../src/withForm';
 import createHydrateProvider from '../src/createHydrateProvider';

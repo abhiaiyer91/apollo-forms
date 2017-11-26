@@ -10,7 +10,7 @@ import {
 } from 'revalidate';
 import createForm from '../src/withForm';
 import FormProvider from '../src/FormProvider';
-import { Input, TextArea } from './Inputs';
+import { Input, TextArea, Select } from './Inputs';
 
 function SubmitControls() {
   return <button type="submit">Submit</button>;
@@ -26,6 +26,8 @@ const fragment = gql`
   fragment client on ClientData {
     name
     age
+    city
+    description
   }
 `;
 
@@ -57,12 +59,14 @@ const sampleValidator = combineValidators({
   name: composeValidators(isRequired, isAlphabetic)('Name'),
   age: composeValidators(isRequired, isNumeric)('Age'),
   description: composeValidators(hasLengthGreaterThan('1'))('Description'),
+  city: composeValidators(isRequired, hasLengthGreaterThan('1'))('City'),
 });
 
 const initialData = {
   name: null,
   age: null,
   description: null,
+  city: null,
 };
 
 export default function SimpleForm() {
@@ -85,6 +89,13 @@ export default function SimpleForm() {
       <Input field="name" />
       <Input type="number" field="age" />
       <TextArea field="description" />
+      <Select
+        field="city"
+        options={[
+          { label: 'Los Angeles', value: 'LA' },
+          { label: 'New York', value: 'NYC' },
+        ]}
+      />
 
       <SubmitControls />
     </Form>

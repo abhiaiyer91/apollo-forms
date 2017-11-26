@@ -54,6 +54,7 @@ export default compose(
     onChange: ({ field, setInternalValue, onChange, setFieldError }) => {
       return (e) => {
         const value = e.target.value;
+
         setInternalValue(value);
 
         return onChange({
@@ -67,12 +68,14 @@ export default compose(
     },
   }),
   withValidationMessage,
-  mapProps(({ type, onChange, field, value }) => {
+  mapProps(({ type, options, children, onChange, field, value }) => {
     return {
       type,
+      options,
       onChange,
       name: field,
       value,
+      children,
     };
   }),
 );
