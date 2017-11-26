@@ -2,16 +2,29 @@
 
 ## 1. Create a Client query
 
-### 1a. Create a query for your form state
+### 1a. Create a fragment to represent your form field keys
+
+```js
+import gql from 'graphql-tag';
+
+const fragment = gql`
+  fragment client on ClientData {
+    name
+    age
+  }
+`;
+```
+
+### 1b. Create a query for your form state
 
 ```js
 import gql from 'graphql-tag';
 
 const inputQuery = gql`
+  ${fragment}
   {
     sampleForm @client {
-      name
-      age
+      ...client
     }
   }
 `;
@@ -25,16 +38,16 @@ Error queries are namespaced like so: `{FORM_NAME}Errors`
 import gql from 'graphql-tag';
 
 const errorsQuery = gql`
+  ${fragment}
   {
     sampleFormErrors @client {
-      name
-      age
+      ...client
     }
   }
 `;
 ```
 
-## 2. Create a Schema
+## 2. Creating Initial Props
 
 ### 2a. Create a validator
 
@@ -50,46 +63,38 @@ const validator = combineValidators({
 ### 2b. Supply Initial State
 
 ```js
-const model = {
+const initialData = {
   name: null,
   age: null,
 }
 ```
 
-### 2c. Instantiate Schema
+## 3. Create a Form Provider w/ formName, and initialData
 
+### 3a. Create your Submit Mutation
 ```js
-import { FormSchema } from 'apollo-forms';
-
-const schema = new FormSchema({
-  model,
-  validator,
-});
-```
-
-## 3. Create your Form Provider w/ formName, inputQuery, and create the component with a mutation to run on "submit"
-
-```js
-import { createForm, FormSchema, FormProvider } from 'apollo-forms';
-
-const schema = new FormSchema({
-  model,
-  validator,
-});
-
 const sampleMutation = gql`
   mutation($inputData: PersonInput) {
     createSample(inputData: $inputData)
   }
 `;
+```
+
+### 3b. Create your form
+```js
+import { createForm, FormSchema, FormProvider } from 'apollo-forms';
 
 const Form = createForm({ mutation: sampleMutation, inputQuery, errorsQuery })(FormProvider);
+```
 
+### 3c. Pass in initialData and a formName
+
+```js
 export default function Root() {
   return (
     <Form
+      initialData={initialData}
       formName="sampleForm"
-      schema={schema}
     >
     </Form>
   );
@@ -99,15 +104,14 @@ export default function Root() {
 ## 4. Create an Input w/ a field prop
 
 ```js
-import { withInput, withValidationMessage } from 'apollo-forms';
+import { withInput } from 'apollo-forms';
 
-const Input = compose(withInput, withValidationMessage)('input');
+const Input = withInput('input');
 
 export default function Root() {
   return (
     <Form
       formName="sampleForm"
-      schema={schema}
     >
       <Input
         field="name"
@@ -128,7 +132,6 @@ export default function Root() {
   return (
     <FormProvider
       formName="sampleForm"
-      schema={schema}
     >
       <Input
         field="name"
