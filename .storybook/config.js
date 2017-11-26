@@ -5,11 +5,13 @@ const typeDefs = `
   input PersonInput {
     name: String!
     age: Int!
+    description: String!
   }
 
   type Person {
     name: String
     age: Int
+    description: String
   }
 
   type Query {

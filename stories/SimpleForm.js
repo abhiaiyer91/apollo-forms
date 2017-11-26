@@ -6,11 +6,11 @@ import {
   isRequired,
   isAlphabetic,
   isNumeric,
+  hasLengthGreaterThan,
 } from 'revalidate';
-import FormSchema from '../src/Schema';
 import createForm from '../src/withForm';
 import FormProvider from '../src/FormProvider';
-import { Input } from './Inputs';
+import { Input, TextArea } from './Inputs';
 
 function SubmitControls() {
   return <button type="submit">Submit</button>;
@@ -32,8 +32,7 @@ const fragment = gql`
 const query = gql`
   {
     sampleForm @client {
-      name
-      age
+      ...client
     }
   }
   ${fragment}
@@ -42,8 +41,7 @@ const query = gql`
 const errorsQuery = gql`
   {
     sampleFormErrors @client {
-      name
-      age
+      ...client
     }
   }
   ${fragment}
@@ -58,11 +56,13 @@ const Form = createForm({
 const sampleValidator = combineValidators({
   name: composeValidators(isRequired, isAlphabetic)('Name'),
   age: composeValidators(isRequired, isNumeric)('Age'),
+  description: composeValidators(hasLengthGreaterThan('1'))('Description'),
 });
 
 const initialData = {
   name: null,
   age: null,
+  description: null,
 };
 
 export default function SimpleForm() {
@@ -84,6 +84,8 @@ export default function SimpleForm() {
     >
       <Input field="name" />
       <Input type="number" field="age" />
+      <TextArea field="description" />
+
       <SubmitControls />
     </Form>
   );
