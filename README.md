@@ -2,6 +2,8 @@
 
 ## 1. Create a Client query
 
+### 1a. Create a query for your form state
+
 ```js
 import gql from 'graphql-tag';
 
@@ -15,7 +17,22 @@ const inputQuery = gql`
 `;
 ```
 
-This query represents our form state.
+### 1b. Create a query to represent your error state
+
+Error queries are namespaced like so: `{FORM_NAME}Errors`
+
+```js
+import gql from 'graphql-tag';
+
+const errorsQuery = gql`
+  {
+    sampleFormErrors @client {
+      name
+      age
+    }
+  }
+`;
+```
 
 ## 2. Create a Schema
 
@@ -53,7 +70,7 @@ const schema = new FormSchema({
 ## 3. Create your Form Provider w/ formName, inputQuery, and create the component with a mutation to run on "submit"
 
 ```js
-import { createForm, FormSchema } from 'apollo-forms';
+import { createForm, FormSchema, FormProvider } from 'apollo-forms';
 
 const schema = new FormSchema({
   model,
@@ -66,15 +83,15 @@ const sampleMutation = gql`
   }
 `;
 
-const FormProvider = createForm({ mutation: sampleMutation })('form');
+const Form = createForm({ mutation: sampleMutation, inputQuery, errorsQuery })(FormProvider);
 
 export default function Root() {
   return (
-    <FormProvider
-      inputQuery={inputQuery}
+    <Form
+      formName="sampleForm"
       schema={schema}
     >
-    </FormProvider>
+    </Form>
   );
 }
 ```
@@ -88,8 +105,8 @@ const Input = compose(withInput, withValidationMessage)('input');
 
 export default function Root() {
   return (
-    <FormProvider
-      inputQuery={inputQuery}
+    <Form
+      formName="sampleForm"
       schema={schema}
     >
       <Input
@@ -99,7 +116,7 @@ export default function Root() {
         type="number"
         field="age"
       />
-    </FormProvider>
+    </Form>
   );
 }
 ```
@@ -110,7 +127,7 @@ export default function Root() {
 export default function Root() {
   return (
     <FormProvider
-      inputQuery={inputQuery}
+      formName="sampleForm"
       schema={schema}
     >
       <Input
