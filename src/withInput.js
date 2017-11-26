@@ -7,19 +7,9 @@ import {
   mapProps,
   withProps,
 } from 'recompose';
-import React from 'react';
-import { graphql } from 'react-apollo';
+import withErrorQuery from './withErrorQuery';
+import withSetFieldError from './withSetFieldError';
 import _formContextTypes from './_formContextTypes';
-
-function withErrorQuery(BaseComponent) {
-  return ({ errorsQuery, ...rest }) => {
-    const WrappedBaseComponent = graphql(errorsQuery, {
-      name: 'errorData',
-    })(BaseComponent);
-
-    return <WrappedBaseComponent errorsQuery={errorsQuery} {...rest} />;
-  };
-}
 
 export default compose(
   getContext(_formContextTypes),
@@ -58,17 +48,9 @@ export default compose(
       return setInternalValue(initialValue);
     },
   }),
+  withSetFieldError,
   withHandlers({
-    onChange: ({
-      field,
-      FormClient,
-      errorsQuery,
-      formData,
-      schema,
-      formName,
-      setInternalValue,
-      onChange,
-    }) => {
+    onChange: ({ field, setInternalValue, onChange, setFieldError }) => {
       return (e) => {
         const value = e.target.value;
         setInternalValue(value);
@@ -77,40 +59,7 @@ export default compose(
           field,
           value,
           onUpdate: () => {
-            let errorField;
-
-            try {
-              errorField = FormClient.readQuery({ query: errorsQuery });
-            } catch (error) {
-              errorField = {};
-            }
-
-            let errorData = errorField[`${formName}Errors`];
-
-            const schemaValidation = schema.validate({
-              ...formData,
-              [field]: value,
-            });
-
-            let isFieldInValidation;
-
-            if (!!schemaValidation[field]) {
-              isFieldInValidation = { [field]: schemaValidation[field] };
-            } else {
-              isFieldInValidation = { [field]: null };
-            }
-
-            errorData = {
-              ...errorData,
-              ...isFieldInValidation,
-            };
-
-            errorField[`${formName}Errors`] = errorData;
-
-            return FormClient.writeQuery({
-              query: errorsQuery,
-              data: errorField,
-            });
+            return setFieldError({ field, value });
           },
         });
       };

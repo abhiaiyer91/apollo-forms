@@ -1,7 +1,7 @@
 import { graphql } from 'react-apollo';
 import { compose, withHandlers } from 'recompose';
 import { noop, omit } from 'lodash';
-import scrollToInvalidKey from './scrollToInvalidKey';
+import withSetErrors from './withSetErrors';
 
 function defaultTransform(props) {
   return { inputData: omit(props, '__typename') };
@@ -14,55 +14,22 @@ function defaultErrorLogger(e) {
 export default function (mutation) {
   return compose(
     graphql(mutation),
+    withSetErrors,
     withHandlers({
       onSubmit: ({
         mutate,
-        schema,
-        onErrorMessage = noop,
         onSuccess = noop,
         onError = defaultErrorLogger,
         transform = defaultTransform,
         formData,
-        FormClient,
-        errorsQuery,
-        scrollOnValidKey = true,
         variables = {},
-        formName,
+        setErrors = noop,
       }) => {
         return (e) => {
           e.preventDefault();
 
-          const errorMessage = schema.validate(formData);
-          const errorKeys = Object.keys(errorMessage);
-
-          if (errorMessage && errorKeys && errorKeys.length > 0) {
-            if (scrollOnValidKey) {
-              scrollToInvalidKey(errorKeys[0]);
-            }
-
-            let errorField;
-
-            try {
-              errorField = FormClient.readQuery({ query: errorsQuery });
-            } catch (error) {
-              errorField = {};
-            }
-
-            let errorData = errorField[`${formName}Errors`];
-
-            errorData = {
-              ...errorData,
-              ...errorMessage,
-            };
-
-            errorField[`${formName}Errors`] = errorData;
-
-            FormClient.writeQuery({
-              query: errorsQuery,
-              data: errorField,
-            });
-
-            return onErrorMessage(errorMessage);
+          if (setErrors()) {
+            return;
           }
 
           return mutate({

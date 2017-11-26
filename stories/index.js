@@ -11,6 +11,7 @@ import {
 } from 'revalidate';
 import { compose, withProps } from 'recompose';
 import FormSchema from '../src/Schema';
+import FormProvider from '../src/FormProvider';
 import createForm from '../src/withForm';
 import withValidationMessage from '../src/withValidationMessage';
 import withInput from '../src/withInput';
@@ -57,6 +58,15 @@ storiesOf('Forms', module)
       }
     `;
 
+    const errorsQuery = gql`
+      {
+        sampleFormErrors @client {
+          name
+          age
+        }
+      }
+    `;
+
     const hydrationQuery = gql`
       query sample {
         sampleForm {
@@ -84,14 +94,14 @@ storiesOf('Forms', module)
     )(FormFetcher);
 
     const Form = compose(
-      withProps(({ data }) => {
+      withProps(({ initialData }) => {
         const sampleValidator = combineValidators({
-          name: composeValidators(isRequired, isAlphabetic)('Name'),
+          name: composeValidators(isRequired)('Name'),
           age: composeValidators(isRequired, isNumeric)('Age'),
         });
 
         const Schema = new FormSchema({
-          model: data,
+          model: initialData,
           validator: sampleValidator,
         });
 
@@ -99,8 +109,8 @@ storiesOf('Forms', module)
           schema: Schema,
         };
       }),
-      createForm({ mutation: sampleMutation })
-    )('form');
+      createForm({ mutation: sampleMutation, inputQuery, errorsQuery })
+    )(FormProvider);
 
     const Input = compose(withInput, withValidationMessage)('input');
 
