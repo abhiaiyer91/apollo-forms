@@ -6,7 +6,6 @@ import {
   combineValidators,
   composeValidators,
   isRequired,
-  isAlphabetic,
   isNumeric,
 } from 'revalidate';
 import { compose, withProps } from 'recompose';
