@@ -10,6 +10,7 @@ import {
 import { compose } from 'recompose';
 import FormSchema from '../src/Schema';
 import createForm from '../src/withForm';
+import FormProvider from '../src/FormProvider';
 import withValidationMessage from '../src/withValidationMessage';
 import withInput from '../src/withInput';
 
@@ -23,7 +24,29 @@ const sampleMutation = gql`
   }
 `;
 
-const Form = createForm({ mutation: sampleMutation })('form');
+const query = gql`
+  {
+    sampleForm @client {
+      name
+      age
+    }
+  }
+`;
+
+const errorsQuery = gql`
+  {
+    sampleFormErrors @client {
+      name
+      age
+    }
+  }
+`;
+
+const Form = createForm({
+  mutation: sampleMutation,
+  inputQuery: query,
+  errorsQuery: errorsQuery,
+})(FormProvider);
 const Input = compose(withInput, withValidationMessage)('input');
 
 const sampleValidator = combineValidators({
@@ -38,15 +61,6 @@ const Schema = new FormSchema({
   },
   validator: sampleValidator,
 });
-
-const query = gql`
-  {
-    sampleForm @client {
-      name
-      age
-    }
-  }
-`;
 
 export default function SimpleForm() {
   return (
@@ -63,7 +77,6 @@ export default function SimpleForm() {
       }}
       formName="sampleForm"
       schema={Schema}
-      inputQuery={query}
     >
       <Input field="name" />
       <Input type="number" field="age" />

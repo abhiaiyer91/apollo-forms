@@ -12,6 +12,19 @@ function createFormState(formName, model) {
           __typename: formName,
         };
       },
+      [`${formName}Errors`]: () => {
+        const modelKeys = Object.keys(model);
+        const initialModel = modelKeys.reduce((memo, currentVal) => {
+          return {
+            ...memo,
+            [currentVal]: null,
+          };
+        }, {});
+        return {
+          ...initialModel,
+          __typename: `${formName}Errors`,
+        };
+      },
     },
   });
 }
@@ -31,7 +44,12 @@ export default compose(
   }),
   lifecycle({
     componentDidMount() {
-      const { FormClient, inputQuery } = this.props;
+      const { FormClient, inputQuery, errorsQuery } = this.props;
+
+      if (!!errorsQuery) {
+        FormClient.query({ query: errorsQuery });
+      }
+
       return FormClient.query({ query: inputQuery });
     },
   })

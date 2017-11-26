@@ -6,5 +6,6 @@ export default {
   formName: PropTypes.string,
   schema: PropTypes.any,
   inputQuery: PropTypes.any,
+  errorsQuery: PropTypes.any,
   initialData: PropTypes.any,
 };

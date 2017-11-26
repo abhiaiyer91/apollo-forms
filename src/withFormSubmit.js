@@ -23,8 +23,11 @@ export default function (mutation) {
         onError = defaultErrorLogger,
         transform = defaultTransform,
         formData,
+        FormClient,
+        errorsQuery,
         scrollOnValidKey = true,
         variables = {},
+        formName,
       }) => {
         return (e) => {
           e.preventDefault();
@@ -36,6 +39,28 @@ export default function (mutation) {
             if (scrollOnValidKey) {
               scrollToInvalidKey(errorKeys[0]);
             }
+
+            let errorField;
+
+            try {
+              errorField = FormClient.readQuery({ query: errorsQuery });
+            } catch (error) {
+              errorField = {};
+            }
+
+            let errorData = errorField[`${formName}Errors`];
+
+            errorData = {
+              ...errorData,
+              ...errorMessage,
+            };
+
+            errorField[`${formName}Errors`] = errorData;
+
+            FormClient.writeQuery({
+              query: errorsQuery,
+              data: errorField,
+            });
 
             return onErrorMessage(errorMessage);
           }

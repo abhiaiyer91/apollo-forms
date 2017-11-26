@@ -10,6 +10,7 @@ export default withContext(
     formName,
     FormClient,
     initialData,
+    errorsQuery,
   }) => {
     return {
       initialData,
@@ -17,6 +18,7 @@ export default withContext(
       FormClient,
       onChange,
       inputQuery,
+      errorsQuery,
       formName,
     };
   }
