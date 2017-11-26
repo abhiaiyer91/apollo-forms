@@ -3,6 +3,7 @@ import {
   getContext,
   withState,
   withHandlers,
+  lifecycle,
   mapProps,
   withPropsOnChange,
 } from 'recompose';
@@ -10,7 +11,9 @@ import { hasErrorAt } from 'revalidate/assertions';
 import _formContextTypes from './_formContextTypes';
 
 export default compose(
-  withState('internalValue', 'setInternalValue', null),
+  withState('internalValue', 'setInternalValue', ({ initialData, field }) => {
+    return (initialData && initialData[field]) || '';
+  }),
   withState('isClean', 'setIsClean', true),
   getContext(_formContextTypes),
   withPropsOnChange(
@@ -23,7 +26,6 @@ export default compose(
       schema,
       field,
       formName,
-      initialData = {},
     }) => {
       let data;
 
@@ -41,13 +43,19 @@ export default compose(
 
       return {
         validationMessage,
-        value: !!internalValue
-          ? internalValue
-          : initialData && initialData[field],
+        value: internalValue,
         hasError: !isClean && hasErrorAt(fieldMessages, field),
       };
     }
   ),
+  lifecycle({
+    componentDidMount() {
+      const { initialData, setInternalValue, field } = this.props;
+      const initialValue = (initialData && initialData[field]) || '';
+
+      return setInternalValue(initialValue);
+    },
+  }),
   withHandlers({
     onChange: ({ field, setInternalValue, onChange, setIsClean }) => {
       return (e) => {
@@ -68,13 +76,14 @@ export default compose(
       };
     },
   }),
-  mapProps(({ type, onChange, field, value, hasError }) => {
+  mapProps(({ type, validationMessage, onChange, field, value, hasError }) => {
     return {
       type,
       onChange,
       name: field,
       value,
       hasError,
+      validationMessage,
     };
   })
 );
