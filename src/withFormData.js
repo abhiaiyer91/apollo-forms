@@ -1,6 +1,6 @@
 import { withProps } from 'recompose';
 
-export default withProps(({ FormClient, formName, inputQuery }) => {
+export default withProps(({ FormClient, formName, inputQuery, schema }) => {
   let currentData;
 
   try {
@@ -11,8 +11,13 @@ export default withProps(({ FormClient, formName, inputQuery }) => {
     currentData = {};
   }
 
+  const initialState = {
+    ...schema.getInitialState(),
+    __typename: formName,
+  };
+
   return {
     dataFromStore: currentData,
-    formData: currentData && currentData[formName],
+    formData: (currentData && currentData[formName]) || initialState,
   };
 });

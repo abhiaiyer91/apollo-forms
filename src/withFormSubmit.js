@@ -1,11 +1,11 @@
 import { graphql } from 'react-apollo';
 import { compose, withHandlers } from 'recompose';
+import { noop, omit } from 'lodash';
+import scrollToInvalidKey from './scrollToInvalidKey';
 
-function identity({ __typename, ...rest }) {
-  return { inputData: rest };
+function defaultTransform(props) {
+  return { inputData: omit(props, '__typename') };
 }
-
-function noop() {}
 
 function defaultErrorLogger(e) {
   return console.error(e.message);
@@ -21,20 +21,22 @@ export default function (mutation) {
         onErrorMessage = noop,
         onSuccess = noop,
         onError = defaultErrorLogger,
-        transform = identity,
+        transform = defaultTransform,
         formData,
+        scrollOnValidKey = true,
         variables = {},
       }) => {
         return (e) => {
           e.preventDefault();
 
           const errorMessage = schema.validate(formData);
+          const errorKeys = Object.keys(errorMessage);
 
-          if (
-            errorMessage &&
-            Object.keys(errorMessage) &&
-            Object.keys(errorMessage).length > 0
-          ) {
+          if (errorMessage && errorKeys && errorKeys.length > 0) {
+            if (scrollOnValidKey) {
+              scrollToInvalidKey(errorKeys[0]);
+            }
+
             return onErrorMessage(errorMessage);
           }
 

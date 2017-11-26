@@ -14,6 +14,7 @@ import FormSchema from '../src/Schema';
 import createForm from '../src/withForm';
 import withValidationMessage from '../src/withValidationMessage';
 import withInput from '../src/withInput';
+import SimpleForm from './SimpleForm';
 
 function SubmitControls() {
   return <button type="submit">Submit</button>;
@@ -21,58 +22,23 @@ function SubmitControls() {
 
 storiesOf('Forms', module)
   .add('Simple Example', () => {
-    const sampleMutation = gql`
-      mutation($inputData: PersonInput) {
-        createSample(inputData: $inputData)
-      }
-    `;
-
-    const Form = createForm({ mutation: sampleMutation })('form');
-    const Input = compose(withInput, withValidationMessage)('input');
-
-    const sampleValidator = combineValidators({
-      name: composeValidators(isRequired, isAlphabetic)('Name'),
-      age: composeValidators(isRequired, isNumeric)('Age'),
-    });
-
-    const Schema = new FormSchema({
-      model: {
-        name: null,
-        age: null,
-      },
-      validator: sampleValidator,
-    });
-
-    const query = gql`
-      {
-        sampleForm @client {
-          name
-          age
-        }
-      }
-    `;
+    return <SimpleForm />;
+  })
+  .add('Form w/ scroll to invalid key', () => {
     return (
-      <Form
-        onSuccess={() => {
-          return alert('Submitted!');
-        }}
-        onError={() => {
-          alert('ERRORED');
-        }}
-        onErrorMessage={(errorMessage) => {
-          const errorKeys = Object.keys(errorMessage);
-          errorKeys &&
-            errorKeys.length > 0 &&
-            alert(errorMessage[errorKeys[0]]);
-        }}
-        formName="sampleForm"
-        schema={Schema}
-        inputQuery={query}
-      >
-        <Input field="name" />
-        <Input type="number" field="age" />
-        <SubmitControls />
-      </Form>
+      <div>
+        <SimpleForm />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+      </div>
     );
   })
   .add('Hydrating Form', () => {
