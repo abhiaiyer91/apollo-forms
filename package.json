@@ -1,6 +1,6 @@
 {
   "name": "apollo-forms",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Form Bindings with Apollo",
   "main": "lib/index.js",
   "author": "Abhi Aiyer",
@@ -48,6 +48,8 @@
     "revalidate": "^1.2.0"
   },
   "scripts": {
+    "release": "standard-version",
+    "prepublish": "babel ./src --ignore test --out-dir ./lib",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   }
