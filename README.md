@@ -130,7 +130,7 @@ export default function Root() {
 ```js
 export default function Root() {
   return (
-    <FormProvider
+    <Form
       formName="sampleForm"
     >
       <Input
@@ -141,7 +141,7 @@ export default function Root() {
         field="age"
       />
       <button type="submit">Submit</button>
-    </FormProvider>
+    </Form>
   );
 }
 ```
