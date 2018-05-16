@@ -52,7 +52,7 @@ const errorsQuery = gql`
 ### 2a. Create a validator
 
 ```js
-import { combineValidators, composeValidators } from 'revalidate';
+import { combineValidators, composeValidators, isAlphabetic, isNumeric, isRequired } from 'revalidate';
 
 const validator = combineValidators({
   name: composeValidators(isRequired, isAlphabetic)('Name'),
